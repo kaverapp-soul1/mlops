@@ -19,7 +19,7 @@ default_args={
 
 
 with DAG(
-    dag_id="weather_etl",
+    dag_id="wind_etl",
     default_args=default_args,
     schedule="@daily",
     catchup=False,
