@@ -1,6 +1,16 @@
-def main():
-    print("Hello from api!")
+from fastapi import FastAPI
+from fastapi.responses import JSONResponse
+
+app=FastAPI()
 
 
-if __name__ == "__main__":
-    main()
+@app.get("/")
+async def root():
+    return JSONResponse(content={"message": "Hello, World!"})
+
+@app.get("/health")
+async def health():
+    return {
+        "status":"ok",
+        "message":"Service is running",
+    }
