@@ -28,10 +28,10 @@ with DAG(
 ) as dag:
 
     @task
-    def extract_wind():
+    def extract_wind(**kwargs):
         http_hook=HttpHook(method="GET",http_conn_id=API_CON_ID)
 
-        endpoint="channels/1785844/feeds.json?results=100"
+        endpoint="channels/1785844/feeds.json"
         response=http_hook.run(endpoint=endpoint)
 
         if response.status_code!=200:
@@ -72,7 +72,7 @@ with DAG(
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS wind_data (
                     id SERIAL PRIMARY KEY,
-                    entry_id INT,
+                    entry_id INT UNIQUE,
                     created_at TIMESTAMP,
                     wind_speed FLOAT,
                     wind_power FLOAT,
@@ -82,10 +82,14 @@ with DAG(
                 )
             """)
 
+
+            # Use ON CONFLICT (entry_id) DO NOTHING to handle duplicates
+            # This ensures that if a record with the same entry_id already exists,
+            # the new insert will be ignored, preventing duplicates.
             insert_query = """
                 INSERT INTO wind_data (entry_id, created_at, wind_speed, wind_power, air_density, temperature_f, pressure_mmhg)
                 VALUES (%s, %s, %s, %s, %s, %s, %s)
-                ON CONFLICT (entry_id) DO NOTHING
+                ON CONFLICT (entry_id) DO NOTHING;
             """
 
             record_time=None
