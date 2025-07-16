@@ -71,7 +71,8 @@ with DAG(
 
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS wind_data (
-                    entry_id SERIAL PRIMARY KEY,
+                    id SERIAL PRIMARY KEY,
+                    entry_id INT,
                     created_at TIMESTAMP,
                     wind_speed FLOAT,
                     wind_power FLOAT,
@@ -84,6 +85,7 @@ with DAG(
             insert_query = """
                 INSERT INTO wind_data (entry_id, created_at, wind_speed, wind_power, air_density, temperature_f, pressure_mmhg)
                 VALUES (%s, %s, %s, %s, %s, %s, %s)
+                ON CONFLICT (entry_id) DO NOTHING
             """
 
             record_time=None
