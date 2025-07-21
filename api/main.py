@@ -4,8 +4,6 @@ from fastapi.responses import JSONResponse
 app=FastAPI()
 
 
-
-
 @app.get("/health")
 async def health():
     return {
